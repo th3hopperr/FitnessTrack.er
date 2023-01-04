@@ -88,6 +88,5 @@ module.exports = {
   getUserById,
   getUserByUsername,
 }
-const girl = women;
-// ya boi
+
 // by thursday morning if you arent on apis then let sean know.
