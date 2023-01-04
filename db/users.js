@@ -17,9 +17,12 @@ async function createUser({ username, password }) {
     const { rows: [user] } = await client.query(`
     INSERT INTO users (username, password)
     VALUES($1, $2)
+    ON CONFLICT (username) DO NOTHING
     RETURNING *;
 
     `, [username, hashedPassword])
+
+    delete user.password;
 
     return user;
 
@@ -30,26 +33,52 @@ async function createUser({ username, password }) {
 }
 
 async function getUser({ username, password }) {
-  const user = await getUserByUsername(username);
-  const hashedPassword = user.password;
-  const passwordsMatch = await bcrypt.compare(password, hashedPassword);
-  if (passwordsMatch) {
-    await client.query(` 
-    SELECT * 
-    FROM users`)
-  } else {
+  try {
+    const user = await getUserByUsername(username);
+    if (!user) return;
+    const hashedPassword = user.password;
+    const passwordsMatch = await bcrypt.compare(password, hashedPassword);
+    if (!passwordsMatch) return;
 
-    console.log('you dont have auth to be here.')
-    throw Error;
+    delete user.password;
+
+    return user;
+  } catch (error) {
+    throw error;
   }
 
 }
 
 async function getUserById(userId) {
+  try {
+    const { rows: [user] } = await client.query(`
+    SELECT * FROM USERS
+    WHERE id = ${userId}
+    `);
 
+    if (!user) {
+      return null;
+    }
+
+    delete user.password;
+    return user;
+
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getUserByUsername(userName) {
+  try {
+    const { rows: [user] } = await client.query(`
+    SELECT * FROM users
+    WHERE username =$1;
+    `, [userName]);
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
 
 }
 
