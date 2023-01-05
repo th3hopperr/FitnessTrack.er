@@ -3,7 +3,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-catch */
-const { query } = require('express');
 const client = require('./client');
 
 // database functions
@@ -84,14 +83,24 @@ async function updateActivity({ id, ...fields }) {
   // don't try to update the id
   // do update the name and description
   // return the updated activity
+  setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index + 1 }`
+  ).join(', ');
 
   try {
+
+    if (setString.length > 0) {
+
+   
+
     const { rows: activities } = await client.query(`
     UPDATE activities
+    SET ${setString}
     WHERE name = $1
+    SET DESCRIPTION = ${setString}
     WHERE description = $1
-    RETURNING *
-    `, [fields])
+    RETURNING *;
+    `, [fields])}
 
     return activities;
 
@@ -101,7 +110,7 @@ async function updateActivity({ id, ...fields }) {
   }
 
 }
-
+ 
 module.exports = {
   getAllActivities,
   getActivityById,
