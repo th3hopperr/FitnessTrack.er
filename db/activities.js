@@ -79,31 +79,30 @@ async function attachActivitiesToRoutines(routines) {
   // select and return an array of all activities
 }
 
-async function updateActivity({ id, ...fields }) {
+async function updateActivity({ id, ...fieldsToUpdate }) {
   // don't try to update the id
   // do update the name and description
   // return the updated activity
-  setString = Object.keys(fields).map(
+  console.log('this is the fields ---', fieldsToUpdate)
+ const setString = Object.keys(fieldsToUpdate).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
+console.log(setString)
 
-  try {
+  if (setString.length === 0) {
+    return;
 
-    if (setString.length > 0) {
-
-   
-
-    const { rows: activities } = await client.query(`
+  }
+  console.log('this is object', Object.values(fieldsToUpdate))
+try {
+    const { rows: [ activates ] } = await client.query(`
     UPDATE activities
-    SET ${setString}
-    WHERE name = $1
-    SET DESCRIPTION = ${setString}
-    WHERE description = $1
+    SET ${ setString }
+    WHERE id=${id}
     RETURNING *;
-    `, [fields])}
+    `, Object.values(fieldsToUpdate));
 
-    return activities;
-
+    return activates;
   } catch (error) {
     throw error;
 
