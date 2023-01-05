@@ -1,39 +1,41 @@
+/* eslint-disable no-empty */
 /* eslint-disable no-unexpected-multiline */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-catch */
+const { query } = require('express');
 const client = require('./client');
 
 // database functions
 async function createActivity({ name, description }) {
   // return the new activity 
   try {
-  const { rows: [activities] } = await client.query 
-   (`
-   INSERT INTO activities ("name", "description")
+    const { rows: [activities] } = await client.query
+      (`
+   INSERT INTO activities (name, description)
    VALUES ($1, $2)
    RETURNING *;
    `, [name, description])
- 
-   return activities;
- 
+
+    return activities;
+
   } catch (error) {
     throw error
   }
-   
- }
+
+}
 
 async function getAllActivities() {
   // select and return an array of all activities
-  try { 
-    const { rows: activitiesName } = await client.query(`
-      SELECT name
-      FROM activities
+  try {
+    const { rows: activities } = await client.query(`
+      SELECT *
+      FROM activities;
     `);
 
-    const activities = await Promise.all(activitiesName.map(
-      activities => getActivityById (activity.name)
-    ));
+    // const activities = await Promise.all(activitiesName.map(
+    //   activities => getActivityById(activity.name)
+    // ));
 
     return activities;
 
@@ -42,30 +44,31 @@ async function getAllActivities() {
   }
 }
 
-async function getActivityById(id) { 
+async function getActivityById(id) {
   try {
-    const { rows: [ activity ]  } = await client.query(`
+    const { rows: [activity] } = await client.query(`
       SELECT *
       FROM activities
       WHERE id=$1;
     `, [id]);
 
     return activity;
-    
+
   } catch (error) {
     throw error
   }
-  
- }
 
-async function getActivityByName(name) { 
+}
+
+async function getActivityByName(name) {
   // eslint-disable-next-line no-useless-catch
   try {
-    const { rows: [ activities ] } = await client.query( `
-      SELECT name 
+    const { rows: [activities] } = await client.query(`
+      SELECT *
       FROM activities
-      WHERE id=${ name }
-    `)
+      WHERE name = $1
+      `, [name])
+
     return activities;
 
   } catch (error) {
@@ -81,6 +84,22 @@ async function updateActivity({ id, ...fields }) {
   // don't try to update the id
   // do update the name and description
   // return the updated activity
+
+  try {
+    const { rows: activities } = await client.query(`
+    UPDATE activities
+    WHERE name = $1
+    WHERE description = $1
+    RETURNING *
+    `, [fields])
+
+    return activities;
+
+  } catch (error) {
+    throw error;
+
+  }
+
 }
 
 module.exports = {

@@ -12,7 +12,7 @@ async function dropTables() {
 
     DROP TABLE IF EXISTS routine_activities;
     DROP TABLE IF EXISTS routines;
-    DROP TABLE IF EXISTS activites;    
+    DROP TABLE IF EXISTS activities;    
     DROP TABLE IF EXISTS users;
     `)
 
@@ -41,7 +41,7 @@ async function createTables() {
       password VARCHAR(255) NOT NULL
     );
 
-    CREATE TABLE activites (
+    CREATE TABLE activities (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) UNIQUE NOT NULL,
       description TEXT NOT NULL
