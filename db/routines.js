@@ -46,15 +46,13 @@ async function getRoutinesWithoutActivities() {
 async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(`
-    SELECT routines.*, users.username AS "creatorName"
-    FROM routines
-    JOIN users ON routines."creatorId" = usersid
+    SELECT routines
     `);
 
     const { rows: activities } = await client.query(`
     SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
     FROM activities
-    JOIN routine_activities ON routine_activities."activity" = activities.id
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
     `)
 
     for (const routine of routines) {
@@ -94,3 +92,6 @@ module.exports = {
   updateRoutine,
   destroyRoutine,
 };
+// .*, users.username AS "creatorName"
+//     FROM routines
+//     JOIN users ON routines."creatorId" = "users.id"
