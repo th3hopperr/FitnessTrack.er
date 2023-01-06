@@ -13,6 +13,7 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 
     return routine;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }
@@ -51,7 +52,7 @@ async function getAllRoutines() {
     `);
 
     const { rows: activities } = await client.query(`
-    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId"
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
     FROM activities
     JOIN routine_activities ON routine_activities."activity" = activities.id
     `)

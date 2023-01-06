@@ -55,8 +55,9 @@ async function createTables() {
 
     CREATE TABLE routine_activities (
       id SERIAL PRIMARY KEY,
-      "routineId" INTEGER REFERENCES routines (id) UNIQUE,
-      "activityId" INTEGER REFERENCES routines (id) UNIQUE,
+      "routineId" INTEGER REFERENCES routines (id),
+      "activityId" INTEGER REFERENCES activities (id),
+      UNIQUE ("routineId", "activityId"),
       duration INTEGER,
       count INTEGER
     );
