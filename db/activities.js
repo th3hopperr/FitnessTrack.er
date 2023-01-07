@@ -119,14 +119,14 @@ async function updateActivity({ id, ...fieldsToUpdate }) {
   }
   // console.log('this is object', Object.values(fieldsToUpdate))
   try {
-    const { rows: [activates] } = await client.query(`
+    const { rows: [activities] } = await client.query(`
     UPDATE activities
     SET ${setString}
     WHERE id=${id}
     RETURNING *;
     `, Object.values(fieldsToUpdate));
 
-    return activates;
+    return activities;
   } catch (error) {
     throw error;
 

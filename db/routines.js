@@ -70,44 +70,114 @@ async function getAllRoutines() {
   }
 }
 
-async function getAllPublicRoutines() {
+async function getAllPublicRoutines() { 
   try {
     const { rows: routines } = await client.query(`
-    SELECT *
+    SELECT routines.*, users.username AS "creatorName"
     FROM routines
+    JOIN users ON routines."creatorId" = users.id
     WHERE "isPublic" = true
-    ;
-    `)
+    `);
 
     const { rows: activities } = await client.query(`
-    SELECT 
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
     `)
+
+    for (const routine of routines) {
+      const activitiesToAdd = activities.filter((activity) => activity.routineId === routine.id)
+
+
+      routine.activities = activitiesToAdd
+    }
 
     return routines;
   } catch (error) {
     throw error;
   }
-}
+ }
 
-async function getAllRoutinesByUser({ username }) {
+async function getAllRoutinesByUser({ username }) { 
   try {
-    const { rows: routinesId } = await client.query(`
-    SELECT *
-    FROM routines
-    WHERE "creatorId" = ${username};
+    const { rows: routines } = await client.query(`
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines 
+    JOIN users ON routines."creatorId" = users.id
     `);
 
-    const routines = await Promise.all(routinesId.map(routines => getRoutineById(routines.id)));
+    const { rows: activities } = await client.query(`
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id;
+    `)
 
-    return routines
+    for (const routine of routines) {
+      const activitiesToAdd = activities.filter((activity) => activity.routineId === routine.id)
+
+
+      routine.activities = activitiesToAdd
+    }
+
+    return routines;
   } catch (error) {
     throw error;
   }
-}
+ }
 
-async function getPublicRoutinesByUser({ username }) { }
+async function getPublicRoutinesByUser({ username }) { 
+  try {
+    const { rows: routines } = await client.query(`
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
+    `);
 
-async function getPublicRoutinesByActivity({ id }) { }
+    const { rows: activities } = await client.query(`
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
+    `)
+
+    for (const routine of routines) {
+      const activitiesToAdd = activities.filter((activity) => activity.routineId === routine.id)
+
+
+      routine.activities = activitiesToAdd
+    }
+
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+ }
+
+async function getPublicRoutinesByActivity({ id }) { 
+  try {
+    const { rows: routines } = await client.query(`
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
+    `);
+
+    const { rows: activities } = await client.query(`
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", routine_activities.duration, routine_activities.count
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
+    `)
+
+    for (const routine of routines) {
+      const activitiesToAdd = activities.filter((activity) => activity.routineId === routine.id)
+
+
+      routine.activities = activitiesToAdd
+    }
+
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+ }
 
 async function updateRoutine({ id, ...fields }) { }
 
