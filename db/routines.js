@@ -46,7 +46,9 @@ async function getRoutinesWithoutActivities() {
 async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(`
-    SELECT routines
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
     `);
 
     const { rows: activities } = await client.query(`
@@ -68,9 +70,40 @@ async function getAllRoutines() {
   }
 }
 
-async function getAllPublicRoutines() { }
+async function getAllPublicRoutines() {
+  try {
+    const { rows: routines } = await client.query(`
+    SELECT *
+    FROM routines
+    WHERE "isPublic" = true
+    ;
+    `)
 
-async function getAllRoutinesByUser({ username }) { }
+    const { rows: activities } = await client.query(`
+    SELECT 
+    `)
+
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getAllRoutinesByUser({ username }) {
+  try {
+    const { rows: routinesId } = await client.query(`
+    SELECT *
+    FROM routines
+    WHERE "creatorId" = ${username};
+    `);
+
+    const routines = await Promise.all(routinesId.map(routines => getRoutineById(routines.id)));
+
+    return routines
+  } catch (error) {
+    throw error;
+  }
+}
 
 async function getPublicRoutinesByUser({ username }) { }
 
