@@ -48,7 +48,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
   }
 }
 
-async function updateRoutineActivity({ id, ...fields }) { 
+async function updateRoutineActivity({ id, ...fields }) {
   const setString = Object.keys(fields).map(
     (key, index) => `"${key}"=$${index + 1}`
   ).join(', ');
@@ -91,17 +91,28 @@ async function destroyRoutineActivity(id) {
   }
 }
 
-async function canEditRoutineActivity(routineActivityId, userId) { 
+async function canEditRoutineActivity(routineActivityId, userId) {
   try {
-    const  { rows: [routineActivityId]} = await client.query(`
-    
-    `)
-    return routineActivityId
+    const { rows: [routine_activities] } = await client.query(`
+    SELECT "routineId"
+    FROM routine_activities
+    WHERE id = $1;
+    `, [routineActivityId])
+
+    const { rows: [routine] } = await client.query(`
+    SELECT "creatorId"
+    FROM routines
+    WHERE id = $1
+    `, [routine_activities.routineId])
+
+    if (userId === routine.creatorId) {
+      return true;
+    } else return false;
   } catch (error) {
-    throw error
-    
+    throw error;
   }
- }
+}
+
 
 module.exports = {
   getRoutineActivityById,
